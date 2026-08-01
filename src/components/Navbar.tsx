@@ -35,6 +35,10 @@ export default function Navbar() {
 
         <Link to="/admin">
           Admin
+        </Link>           
+           
+        <Link to="/admin/editor">
+        Editor
         </Link>
 
         <Link to="/play">

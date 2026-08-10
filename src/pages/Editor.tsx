@@ -16,13 +16,15 @@ import {
 
 
 import {
-    savePuzzle
+    savePuzzle,
+    savePuzzleRemote
 } from "../crossword/puzzleStore";
 
 
 import {
     encodePuzzleToParam,
     buildShareUrl,
+    buildShareUrlById,
     MAX_SAFE_URL_LENGTH
 } from "../crossword/shareLink";
 
@@ -580,7 +582,27 @@ export default function Editor() {
         setPublishError(!localSaveSuccess);
 
 
+        // try a remote save first — gives a short link with no size limit,
+        // and lets any device open it (not just this browser).
+        const remoteId =
+            await savePuzzleRemote(puzzle);
 
+
+        if(remoteId){
+
+            setShareLink(buildShareUrlById(remoteId));
+
+            setShareLinkTooLong(false);
+
+            setPublishing(false);
+
+            return;
+
+        }
+
+
+        // fallback: old self-contained URL-encoded link, in case the
+        // API/database isn't reachable (e.g. offline, not deployed yet)
         try {
 
 

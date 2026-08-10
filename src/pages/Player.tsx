@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 
 import {
     loadPuzzle,
-    savePuzzle
+    savePuzzle,
+    loadPuzzleRemote
 } from "../crossword/puzzleStore";
 
 import {
@@ -175,6 +176,8 @@ export default function Player() {
                     new URLSearchParams(window.location.search);
 
 
+                const id = params.get("id");
+
                 const encoded = params.get("p");
 
 
@@ -183,8 +186,26 @@ export default function Player() {
                 let broken = false;
 
 
-                if(encoded){
+                if(id){
 
+                    // remote lookup — stored via /api/puzzle when someone published
+                    loaded = await loadPuzzleRemote(id);
+
+
+                    if(!loaded){
+
+                        broken = true;
+
+                    } else {
+
+                        savePuzzle(loaded);
+
+                    }
+
+
+                } else if(encoded){
+
+                    // legacy self-contained link — puzzle data lives in the URL itself
                     loaded = await decodePuzzleFromParam(encoded);
 
 

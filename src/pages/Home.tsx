@@ -10,7 +10,7 @@ export default function Home() {
         font-bold
         "
       >
-        Create Crossword Puzzles
+        Create Crossword Puzzlez
       </h1>
 
 

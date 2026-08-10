@@ -9,30 +9,15 @@ export interface CrosswordCell {
 }
 
 
-export interface CrosswordHint {
-
-    text: string;
-
-    imageUrl?: string;
-
-}
-
-
 export interface CrosswordWord {
 
     answer: string;
 
     clue: string;
 
+    hints?: string[];
+
     imageUrl?: string;
-
-    hints?: CrosswordHint[];
-
-    difficulty?: "easy" | "medium" | "hard";
-
-    points?: number;
-
-    hintPenalty?: number;
 
     row?: number;
 
@@ -61,8 +46,6 @@ export interface CrosswordResult {
     grid: CrosswordCell[][];
 
     placedWords: PlacedWord[];
-
-    unplacedAnswers: string[];
 
 }
 

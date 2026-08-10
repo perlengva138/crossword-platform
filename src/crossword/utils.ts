@@ -1,14 +1,44 @@
-export const GRID_SIZE = 15;
+import type {
+    CrosswordCell
+} from "./types";
 
 
-export function createEmptyGrid(){
+
+export function createEmptyGrid(size:number){
 
     return Array.from(
         {
-            length: GRID_SIZE
+            length: size
         },
+
         () =>
-            Array(GRID_SIZE).fill("")
+            Array.from(
+                {
+                    length: size
+                },
+
+                (): CrosswordCell => ({
+
+                    letter:"",
+
+                    isBlack:true
+
+                })
+
+            )
+
+    );
+
+}
+
+
+
+
+export function computeCellPx(gridSize:number):number {
+
+    return Math.max(
+        16,
+        Math.min(40, Math.floor(700 / gridSize))
     );
 
 }

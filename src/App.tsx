@@ -6,6 +6,8 @@ import {
 
 import MainLayout from "./layouts/MainLayout";
 
+import AdminGate from "./components/AdminGate";
+
 import Home from "./pages/Home";
 import Admin from "./pages/Admin";
 import Player from "./pages/Player";
@@ -29,7 +31,7 @@ element={<Home/>}
 
 <Route
 path="/admin"
-element={<Admin/>}
+element={<AdminGate><Admin/></AdminGate>}
 />
 
 <Route
@@ -39,7 +41,7 @@ element={<Player/>}
 
 <Route
 path="/admin/editor"
-element={<Editor/>}
+element={<AdminGate><Editor/></AdminGate>}
 />
 
 </Route>

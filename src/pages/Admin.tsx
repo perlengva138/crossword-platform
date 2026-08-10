@@ -10,7 +10,7 @@ export default function Admin() {
         font-bold
         "
       >
-        Admin Dashboard
+        Admin Dash
       </h1>
 
 

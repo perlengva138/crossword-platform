@@ -15,6 +15,10 @@ const MIN_GRID_SIZE = 15;
 
 const MAX_RETRY_PASSES = 8;
 
+// how many empty/black border cells to keep around the placed words,
+// purely for visual breathing room after cropping
+const CROP_PADDING = 1;
+
 
 
 export function computeGridSize(wordCount:number):number {
@@ -241,6 +245,94 @@ function findSpotAnywhere(
 
 
 
+// finds the bounding box of every filled (non-black) cell, then returns a
+// new grid cropped to that box (plus a little padding), with placedWords'
+// row/col shifted to match the cropped coordinates. this turns the large
+// scratch canvas used for placement into a tight grid that matches how many
+// words actually got placed, instead of leaving huge unused black margins.
+function cropToContent(
+    grid:CrosswordCell[][],
+    placedWords:PlacedWord[]
+):{ grid:CrosswordCell[][], placedWords:PlacedWord[] } {
+
+
+    let minRow = grid.length;
+
+    let maxRow = -1;
+
+    let minCol = grid.length;
+
+    let maxCol = -1;
+
+
+    for(let r=0;r<grid.length;r++){
+
+        for(let c=0;c<grid.length;c++){
+
+            if(grid[r][c].letter !== ""){
+
+                if(r < minRow) minRow = r;
+
+                if(r > maxRow) maxRow = r;
+
+                if(c < minCol) minCol = c;
+
+                if(c > maxCol) maxCol = c;
+
+            }
+
+        }
+
+    }
+
+
+    // nothing was placed — return as-is, nothing to crop
+    if(maxRow === -1){
+
+        return { grid, placedWords };
+
+    }
+
+
+    const startRow =
+        Math.max(0, minRow - CROP_PADDING);
+
+    const endRow =
+        Math.min(grid.length - 1, maxRow + CROP_PADDING);
+
+    const startCol =
+        Math.max(0, minCol - CROP_PADDING);
+
+    const endCol =
+        Math.min(grid.length - 1, maxCol + CROP_PADDING);
+
+
+    const croppedGrid =
+        grid
+        .slice(startRow, endRow + 1)
+        .map(row => row.slice(startCol, endCol + 1));
+
+
+    const adjustedWords =
+        placedWords.map(
+            word => ({
+                ...word,
+                row: word.row - startRow,
+                col: word.col - startCol
+            })
+        );
+
+
+    return {
+        grid: croppedGrid,
+        placedWords: adjustedWords
+    };
+
+}
+
+
+
+
 export function generateCrossword(
     words:CrosswordWord[]
 ):CrosswordResult{
@@ -422,11 +514,16 @@ export function generateCrossword(
 
 
 
+    const cropped =
+        cropToContent(grid, placedWords);
+
+
+
     return {
 
-        grid,
+        grid: cropped.grid,
 
-        placedWords,
+        placedWords: cropped.placedWords,
 
         unplacedAnswers: remaining.map(w => w.answer)
 

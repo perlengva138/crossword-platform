@@ -162,6 +162,65 @@ export default function Player() {
 
 
 
+    // measures the real space available for the grid directly from the DOM
+    // (its own rendered width, and the gap between it and the bottom of the
+    // viewport) instead of guessing with fixed pixel constants. this is what
+    // makes sizing adapt correctly to any monitor/window size automatically.
+    const gridWrapperRef =
+        useRef<HTMLDivElement>(null);
+
+
+    const [availableSize, setAvailableSize] =
+        useState({ width: 900, height: 600 });
+
+
+    useEffect(
+        () => {
+
+            function measure() {
+
+                if(!gridWrapperRef.current)
+                    return;
+
+
+                const rect =
+                    gridWrapperRef.current.getBoundingClientRect();
+
+
+                const availableWidth =
+                    rect.width;
+
+
+                const availableHeight =
+                    Math.max(
+                        200,
+                        window.innerHeight - rect.top - 24
+                    );
+
+
+                setAvailableSize({
+                    width: availableWidth,
+                    height: availableHeight
+                });
+
+            }
+
+
+            measure();
+
+
+            window.addEventListener("resize", measure);
+
+
+            return () =>
+                window.removeEventListener("resize", measure);
+
+        },
+        [puzzle]
+    );
+
+
+
 
     useEffect(
         () => {
@@ -787,7 +846,15 @@ export default function Player() {
     const activeWordStart = activeWordCells[0] ?? null;
 
 
-    const cellPx = computeCellPx(puzzle.grid.length);
+    // sized to fit the actually-measured available space in both
+    // directions, so the grid fills the screen without needing to scroll,
+    // and adapts correctly across different monitor resolutions
+    const cellPx =
+        computeCellPx(
+            puzzle.grid.length,
+            availableSize.width,
+            availableSize.height
+        );
 
 
 
@@ -1022,12 +1089,12 @@ export default function Player() {
 
             {/* GRID + CLUES */}
 
-            <div className="mt-10 flex gap-16">
+            <div className="mt-10 flex flex-col items-center gap-8">
 
 
             <div
-                className="overflow-auto"
-                style={{maxWidth:"800px", maxHeight:"80vh"}}
+                ref={gridWrapperRef}
+                className="overflow-auto w-full flex justify-center"
             >
 
             <div className="inline-block">
@@ -1229,23 +1296,30 @@ export default function Player() {
 
             {/* CLUES */}
 
-            <div>
+            <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-x-16">
 
-                <h2 className="text-xl font-bold">Across</h2>
+                <div>
 
-                {renderClueList(acrossWords)}
+                    <h2 className="text-xl font-bold">Across</h2>
 
+                    {renderClueList(acrossWords)}
 
-                <h2 className="text-xl font-bold mt-6">Down</h2>
+                </div>
 
-                {renderClueList(downWords)}
+                <div>
+
+                    <h2 className="text-xl font-bold md:mt-0 mt-6">Down</h2>
+
+                    {renderClueList(downWords)}
+
+                </div>
 
 
                 {
                     puzzle.superAnswer.length > 0 &&
                     (
 
-                    <div className="mt-8">
+                    <div className="mt-8 md:col-span-2">
 
                         <h2 className="text-xl font-bold">Bonus Answer</h2>
 

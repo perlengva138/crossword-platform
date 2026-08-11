@@ -11,7 +11,8 @@ import {
 
 
 import {
-    computeCellPx
+    computeCellPx,
+    useViewportSize
 } from "../crossword/utils";
 
 
@@ -699,9 +700,19 @@ export default function Editor() {
         .join("");
 
 
+    const { width: viewportWidth, height: viewportHeight } =
+        useViewportSize();
+
+
+    // full-width layout here (no side clue panel like Player has), so the
+    // grid can use almost the whole window, minus some breathing room
     const cellPx =
         grid.length > 0
-        ? computeCellPx(grid.length)
+        ? computeCellPx(
+            grid.length,
+            Math.min(viewportWidth - 80, 1100),
+            viewportHeight * 0.7
+        )
         : 40;
 
 

@@ -77,7 +77,7 @@ function parseBulkLine(line:string):CrosswordWord|null {
 
 
     const match =
-        trimmed.match(/^(\S+)(?:\t+|\s{2,})(.+)$/);
+        trimmed.match(/^(\S+)\s+(.+)$/);
 
 
     if(!match)

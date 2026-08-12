@@ -18,12 +18,14 @@ import {
 
 import {
     savePuzzle,
-    savePuzzleRemote
+    savePuzzleRemote,
+    loadPuzzleRemote
 } from "../crossword/puzzleStore";
 
 
 import {
     encodePuzzleToParam,
+    decodePuzzleFromParam,
     buildShareUrl,
     buildShareUrlById,
     MAX_SAFE_URL_LENGTH
@@ -268,6 +270,30 @@ export default function Editor() {
     const [linkCopied, setLinkCopied]
         =
         useState(false);
+
+
+
+    const [loadLinkInput, setLoadLinkInput]
+        =
+        useState("");
+
+
+
+    const [loading, setLoading]
+        =
+        useState(false);
+
+
+
+    const [loadError, setLoadError]
+        =
+        useState<string|null>(null);
+
+
+
+    const [loadSuccessCount, setLoadSuccessCount]
+        =
+        useState<number|null>(null);
 
 
 
@@ -552,6 +578,132 @@ export default function Editor() {
 
 
 
+    // loads an already-published puzzle from a pasted share link (either the
+    // short ?id=... form saved remotely, or the older self-contained ?p=...
+    // encoded-URL form) and restores its words back into the editable words
+    // list, so more words can be added and the puzzle regenerated.
+    async function loadExistingPuzzle() {
+
+
+        setLoadError(null);
+
+        setLoadSuccessCount(null);
+
+        setLoading(true);
+
+
+        let parsedUrl:URL;
+
+
+        try {
+
+            parsedUrl = new URL(loadLinkInput.trim());
+
+        } catch {
+
+            setLoadError("That doesn't look like a valid link — paste the full share URL.");
+
+            setLoading(false);
+
+            return;
+
+        }
+
+
+        const id = parsedUrl.searchParams.get("id");
+
+        const encoded = parsedUrl.searchParams.get("p");
+
+
+        let puzzle:StoredPuzzle|null = null;
+
+
+        if(id){
+
+            puzzle = await loadPuzzleRemote(id);
+
+        } else if(encoded){
+
+            puzzle = await decodePuzzleFromParam(encoded);
+
+        }
+
+
+        if(!puzzle){
+
+            setLoadError("Couldn't find a puzzle at that link. Double check it was copied in full.");
+
+            setLoading(false);
+
+            return;
+
+        }
+
+
+        // strip placement-only fields (row/col/direction/number) so these
+        // become plain editable words again, ready to regenerate alongside
+        // any new words added on top
+        const restoredWords:CrosswordWord[] =
+            puzzle.placedWords.map(
+                w => ({
+
+                    answer: w.answer,
+
+                    clue: w.clue,
+
+                    imageUrl: w.imageUrl,
+
+                    hints: w.hints,
+
+                    difficulty: w.difficulty,
+
+                    points: w.points,
+
+                    hintPenalty: w.hintPenalty
+
+                })
+            );
+
+
+        setTitle(puzzle.title);
+
+        setWords(restoredWords);
+
+
+        // clear any previously generated grid — regenerate fresh once
+        // new words (if any) are added on top of the restored list
+        setGrid([]);
+
+        setPlacedWords([]);
+
+        setUnplacedAnswers([]);
+
+        setSuperAnswer([]);
+
+        setMarkingSuperAnswer(false);
+
+        setPublished(false);
+
+        setPublishError(false);
+
+        setShareLink(null);
+
+        setShareLinkTooLong(false);
+
+        setLinkCopied(false);
+
+
+        setLoadSuccessCount(restoredWords.length);
+
+        setLoadLinkInput("");
+
+        setLoading(false);
+
+    }
+
+
+
+
     async function publish() {
 
 
@@ -761,6 +913,85 @@ export default function Editor() {
                     }
 
                 />
+
+            </div>
+
+
+
+            {/* LOAD EXISTING PUZZLE */}
+
+            <div className="mt-6 max-w-2xl border-t pt-4">
+
+                <h3 className="font-bold text-sm">
+                    Load an Existing Puzzle
+                </h3>
+
+                <p className="text-sm text-gray-500 mt-1">
+                    Paste a puzzle's share link (from Publish) to pull its words, clues, hints, and images back in here — add more on top, then regenerate.
+                </p>
+
+                <div className="flex gap-2 mt-2">
+
+                    <input
+
+                        className="border p-2 rounded flex-1"
+
+                        placeholder="https://yoursite.vercel.app/play?id=..."
+
+                        value={loadLinkInput}
+
+                        onChange={
+                            e =>
+                            setLoadLinkInput(
+                                e.target.value
+                            )
+                        }
+
+                    />
+
+                    <button
+
+                        onClick={loadExistingPuzzle}
+
+                        disabled={loading || loadLinkInput.trim() === ""}
+
+                        className="
+                        bg-indigo-600
+                        text-white
+                        px-4
+                        py-2
+                        rounded
+                        disabled:opacity-50
+                        whitespace-nowrap
+                        "
+
+                    >
+
+                        {loading ? "Loading..." : "Load Puzzle"}
+
+                    </button>
+
+                </div>
+
+
+                {
+                    loadError &&
+                    (
+                        <p className="mt-2 text-sm text-red-600">
+                            {loadError}
+                        </p>
+                    )
+                }
+
+
+                {
+                    loadSuccessCount !== null &&
+                    (
+                        <p className="mt-2 text-sm text-green-600">
+                            Loaded {loadSuccessCount} word{loadSuccessCount !== 1 ? "s" : ""} — add more below, then click Generate Crossword to rebuild.
+                        </p>
+                    )
+                }
 
             </div>
 

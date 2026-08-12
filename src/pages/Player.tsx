@@ -438,21 +438,21 @@ export default function Player() {
 
 
 
-    function partOfAcross(row:number, col:number) {
+function partOfAcross(row:number, col:number) {
 
-        if(puzzle!.grid[row][col].isBlack)
-            return false;
+    if(puzzle!.grid[row][col].isBlack)
+        return false;
 
+    const left =
+        col > 0 &&
+        !puzzle!.grid[row][col-1].isBlack;
 
-        const left = col > 0 && !puzzle!.grid[row][col-1].isBlack;
+    const right =
+        col < puzzle!.grid[row].length - 1 &&
+        !puzzle!.grid[row][col+1].isBlack;
 
-        const right = col < puzzle!.grid.length - 1 && !puzzle!.grid[row][col+1].isBlack;
-
-
-        return left || right;
-
-    }
-
+    return left || right;
+}
 
 
 
@@ -542,101 +542,119 @@ export default function Player() {
 
 
 
-    function nextCellInDirection(row:number, col:number) {
+  function nextCellInDirection(row:number, col:number) {
 
-        const nr = direction === "down" ? row + 1 : row;
+    const nr =
+        direction === "down"
+        ? row + 1
+        : row;
 
-        const nc = direction === "across" ? col + 1 : col;
+    const nc =
+        direction === "across"
+        ? col + 1
+        : col;
 
+    if(
+        nr < 0 ||
+        nc < 0 ||
+        nr >= puzzle!.grid.length ||
+        nc >= puzzle!.grid[nr].length
+    )
+        return null;
 
-        if(nr < 0 || nc < 0 || nr >= puzzle!.grid.length || nc >= puzzle!.grid.length)
-            return null;
+    if(puzzle!.grid[nr][nc].isBlack)
+        return null;
 
-
-        if(puzzle!.grid[nr][nc].isBlack)
-            return null;
-
-
-        return {row:nr, col:nc};
-
-    }
-
-
-
-
-    function prevCellInDirection(row:number, col:number) {
-
-        const pr = direction === "down" ? row - 1 : row;
-
-        const pc = direction === "across" ? col - 1 : col;
+    return {row:nr, col:nc};
+}
 
 
-        if(pr < 0 || pc < 0 || pr >= puzzle!.grid.length || pc >= puzzle!.grid.length)
-            return null;
+function prevCellInDirection(row:number, col:number) {
+
+    const pr =
+        direction === "down"
+        ? row - 1
+        : row;
+
+    const pc =
+        direction === "across"
+        ? col - 1
+        : col;
+
+    if(
+        pr < 0 ||
+        pc < 0 ||
+        pr >= puzzle!.grid.length ||
+        pc >= puzzle!.grid[pr].length
+    )
+        return null;
+
+    if(puzzle!.grid[pr][pc].isBlack)
+        return null;
+
+    return {row:pr, col:pc};
+}
 
 
-        if(puzzle!.grid[pr][pc].isBlack)
-            return null;
+  function getActiveWordCells() {
 
+    if(!activeCell)
+        return [];
 
-        return {row:pr, col:pc};
+    const cells:{row:number,col:number}[] = [];
 
-    }
+    const {row,col} = activeCell;
 
+    if(direction === "across"){
 
+        let c = col;
 
+        while(
+            c > 0 &&
+            !puzzle!.grid[row][c-1].isBlack
+        )
+            c--;
 
-    function getActiveWordCells() {
+        while(
+            c < puzzle!.grid[row].length &&
+            !puzzle!.grid[row][c].isBlack
+        ){
 
-        if(!activeCell)
-            return [];
+            cells.push({
+                row,
+                col:c
+            });
 
-
-        const cells:{row:number,col:number}[] = [];
-
-        const {row,col} = activeCell;
-
-
-        if(direction === "across"){
-
-            let c = col;
-
-            while(c > 0 && !puzzle!.grid[row][c-1].isBlack)
-                c--;
-
-
-            while(c < puzzle!.grid.length && !puzzle!.grid[row][c].isBlack){
-
-                cells.push({row,col:c});
-
-                c++;
-
-            }
-
-
-        } else {
-
-            let r = row;
-
-            while(r > 0 && !puzzle!.grid[r-1][col].isBlack)
-                r--;
-
-
-            while(r < puzzle!.grid.length && !puzzle!.grid[r][col].isBlack){
-
-                cells.push({row:r,col});
-
-                r++;
-
-            }
-
+            c++;
         }
 
+    } else {
 
-        return cells;
+        let r = row;
+
+        while(
+            r > 0 &&
+            !puzzle!.grid[r-1][col].isBlack
+        )
+            r--;
+
+        while(
+            r < puzzle!.grid.length &&
+            !puzzle!.grid[r][col].isBlack
+        ){
+
+            cells.push({
+                row:r,
+                col
+            });
+
+            r++;
+        }
 
     }
 
+    return cells;
+}
 
 
 

@@ -1214,21 +1214,32 @@ export default function Editor() {
                         />
 
 
-
-                        <button
-
-                            onClick={addDraftHint}
-
-                            className="bg-yellow-500 text-white px-3 rounded"
-
-                        >
-
-                            Add Hint
-
-                        </button>
-
-
                     </div>
+
+
+                    {
+                        hintDraftImageUrl.trim() !== "" &&
+                        (
+                            <img
+                                src={hintDraftImageUrl}
+                                alt="hint preview"
+                                className="h-16 rounded border mt-2"
+                            />
+                        )
+                    }
+
+
+                    <button
+
+                        onClick={addDraftHint}
+
+                        className="bg-yellow-500 text-white px-3 py-2 rounded mt-2"
+
+                    >
+
+                        Add Hint
+
+                    </button>
 
 
 

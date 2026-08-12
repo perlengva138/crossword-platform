@@ -11,14 +11,25 @@ export function numberGrid(
 ){
 
 
-    const size =
+    const rowCount =
         grid.length;
 
 
+    // grids produced by generator.ts are not guaranteed to be square —
+    // cropToContent trims to the actual bounding box of placed words,
+    // which is usually wider or taller than it is the other way around.
+    // using a single "size" for both row and column bounds (as this used
+    // to) silently skips columns on non-square grids and breaks numbering.
+    const colCount =
+        rowCount > 0
+        ? grid[0].length
+        : 0;
 
-    for(let r=0;r<size;r++){
 
-        for(let c=0;c<size;c++){
+
+    for(let r=0;r<rowCount;r++){
+
+        for(let c=0;c<colCount;c++){
 
             grid[r][c].number = undefined;
 
@@ -32,9 +43,9 @@ export function numberGrid(
 
 
 
-    for(let r=0;r<size;r++){
+    for(let r=0;r<rowCount;r++){
 
-        for(let c=0;c<size;c++){
+        for(let c=0;c<colCount;c++){
 
 
             const cell =
@@ -52,7 +63,7 @@ export function numberGrid(
                     grid[r][c-1].letter === ""
                 ) &&
                 (
-                    c+1<size &&
+                    c+1<colCount &&
                     grid[r][c+1].letter !== ""
                 );
 
@@ -63,7 +74,7 @@ export function numberGrid(
                     grid[r-1][c].letter === ""
                 ) &&
                 (
-                    r+1<size &&
+                    r+1<rowCount &&
                     grid[r+1][c].letter !== ""
                 );
 
@@ -91,7 +102,7 @@ export function numberGrid(
                 ...word,
 
                 number:
-                    grid[word.row][word.col].number
+                    grid[word.row]?.[word.col]?.number
 
             })
         );

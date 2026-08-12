@@ -1459,154 +1459,142 @@ export default function Editor() {
                 style={{maxWidth:"100%", maxHeight:"80vh"}}
             >
 
-            <div className="inline-block">
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: `repeat(${grid[0]?.length ?? 0}, ${cellPx}px)`,
+                    gridTemplateRows: `repeat(${grid.length}, ${cellPx}px)`,
+                    fontSize: Math.max(8, Math.floor(cellPx * 0.5))
+                }}
+            >
 
             {
                 grid.map(
-                    (row,rowIndex)=>(
+                    (row,rowIndex)=>
+                    row.map(
+                        (cell,colIndex)=>{
+
+
+                        const superOrder =
+                            getSuperAnswerOrder(
+                                rowIndex,
+                                colIndex
+                            );
+
+
+                        return (
+
 
                         <div
-                            key={rowIndex}
-                            className="flex"
+
+                            key={`${rowIndex}-${colIndex}`}
+
+                            onClick={
+                                () =>
+                                handleCellClick(
+                                    rowIndex,
+                                    colIndex,
+                                    cell.isBlack
+                                )
+                            }
+
+                            className={`
+                            border
+                            relative
+                            flex
+                            items-center
+                            justify-center
+                            font-bold
+
+                            ${
+                                cell.isBlack
+                                ?
+                                "bg-black"
+                                :
+                                "bg-white text-black"
+                            }
+
+                            ${
+                                markingSuperAnswer &&
+                                !cell.isBlack
+                                ?
+                                "cursor-pointer"
+                                :
+                                ""
+                            }
+
+                            ${
+                                superOrder
+                                ?
+                                "ring-2 ring-orange-500"
+                                :
+                                ""
+                            }
+
+                            `}
+
                         >
 
+
                         {
-                            row.map(
-                                (cell,colIndex)=>{
+                            cell.number &&
+                            (
 
+                            <span
+                                className="
+                                absolute
+                                top-0
+                                left-1
+                                text-[9px]
+                                text-gray-500
+                                "
+                            >
 
-                                const superOrder =
-                                    getSuperAnswerOrder(
-                                        rowIndex,
-                                        colIndex
-                                    );
+                                {cell.number}
 
+                            </span>
 
-                                return (
-
-
-                                <div
-
-                                    key={colIndex}
-
-                                    onClick={
-                                        () =>
-                                        handleCellClick(
-                                            rowIndex,
-                                            colIndex,
-                                            cell.isBlack
-                                        )
-                                    }
-
-                                    style={{
-                                        width: cellPx,
-                                        height: cellPx,
-                                        fontSize: Math.max(8, Math.floor(cellPx * 0.5))
-                                    }}
-
-                                    className={`
-                                    border
-                                    relative
-                                    flex
-                                    items-center
-                                    justify-center
-                                    font-bold
-
-                                    ${
-                                        cell.isBlack
-                                        ?
-                                        "bg-black"
-                                        :
-                                        "bg-white text-black"
-                                    }
-
-                                    ${
-                                        markingSuperAnswer &&
-                                        !cell.isBlack
-                                        ?
-                                        "cursor-pointer"
-                                        :
-                                        ""
-                                    }
-
-                                    ${
-                                        superOrder
-                                        ?
-                                        "ring-2 ring-orange-500"
-                                        :
-                                        ""
-                                    }
-
-                                    `}
-
-                                >
-
-
-                                {
-                                    cell.number &&
-                                    (
-
-                                    <span
-                                        className="
-                                        absolute
-                                        top-0
-                                        left-1
-                                        text-[9px]
-                                        text-gray-500
-                                        "
-                                    >
-
-                                        {cell.number}
-
-                                    </span>
-
-                                    )
-                                }
+                            )
+                        }
 
 
 
-                                {
-                                    !cell.isBlack &&
-                                    cell.letter
-                                }
+                        {
+                            !cell.isBlack &&
+                            cell.letter
+                        }
 
 
 
-                                {
-                                    superOrder &&
-                                    (
+                        {
+                            superOrder &&
+                            (
 
-                                    <span
-                                        className="
-                                        absolute
-                                        bottom-0
-                                        right-1
-                                        text-[9px]
-                                        text-orange-600
-                                        font-bold
-                                        "
-                                    >
+                            <span
+                                className="
+                                absolute
+                                bottom-0
+                                right-1
+                                text-[9px]
+                                text-orange-600
+                                font-bold
+                                "
+                            >
 
-                                        {superOrder}
+                                {superOrder}
 
-                                    </span>
+                            </span>
 
-                                    )
-                                }
-
-
-                                </div>
-
-
-                                );
-
-                                }
                             )
                         }
 
 
                         </div>
 
+
+                        );
+
+                        }
                     )
                 )
             }

@@ -1097,193 +1097,215 @@ export default function Player() {
                 className="overflow-auto w-full flex justify-center"
             >
 
-            <div className="inline-block">
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: `repeat(${puzzle.grid[0]?.length ?? 0}, ${cellPx}px)`,
+                    gridTemplateRows: `repeat(${puzzle.grid.length}, ${cellPx}px)`
+                }}
+            >
 
             {
                 puzzle.grid.map(
-                    (row,rowIndex) => (
-
-                        <div key={rowIndex} className="flex">
-
-                        {
-                            row.map(
-                                (cell,colIndex) => {
+                    (row,rowIndex) =>
+                    row.map(
+                        (cell,colIndex) => {
 
 
-                                if(cell.isBlack){
+                        if(cell.isBlack){
 
-                                    return (
-                                        <div
-                                            key={colIndex}
-                                            style={{width: cellPx, height: cellPx}}
-                                            className="border bg-black"
-                                        />
-                                    );
+                            return (
+                                <div
+                                    key={`${rowIndex}-${colIndex}`}
+                                    className="border bg-black"
+                                />
+                            );
 
-                                }
-
-
-                                const typed =
-                                    userAnswers[rowIndex][colIndex];
-
-
-                                const isWrong =
-                                    showErrors &&
-                                    typed !== "" &&
-                                    typed !== cell.letter;
-
-
-                                const isActive =
-                                    activeCell?.row === rowIndex &&
-                                    activeCell?.col === colIndex;
-
-
-                                const inWord =
-                                    isInActiveWord(rowIndex,colIndex);
-
-
-                                const superOrder =
-                                    getSuperAnswerOrder(rowIndex,colIndex);
-
-
-                                let bgClass = "bg-transparent";
-
-                                if(isWrong) bgClass = "bg-red-50";
-
-                                else if(isActive) bgClass = "bg-blue-300";
-
-                                else if(inWord) bgClass = "bg-blue-100";
-
-
-
-                                return (
-
-                                    <div
-                                        key={colIndex}
-
-                                        style={{width: cellPx, height: cellPx}}
-
-                                        className={`
-                                        border
-                                        relative
-                                        ${superOrder ? "ring-2 ring-orange-400" : ""}
-                                        `}
-                                    >
-
-                                    {
-                                        cell.number &&
-                                        (
-
-                                        <span
-                                            className="
-                                            absolute
-                                            top-0
-                                            left-1
-                                            text-[9px]
-                                            text-gray-500
-                                            pointer-events-none
-                                            "
-                                        >
-
-                                            {cell.number}
-
-                                        </span>
-
-                                        )
-                                    }
-
-
-                                    {
-                                        superOrder &&
-                                        (
-
-                                        <span
-                                            className="
-                                            absolute
-                                            bottom-0
-                                            right-1
-                                            text-[9px]
-                                            text-orange-600
-                                            font-bold
-                                            pointer-events-none
-                                            "
-                                        >
-
-                                            {superOrder}
-
-                                        </span>
-
-                                        )
-                                    }
-
-
-                                    <input
-
-                                        ref={
-                                            el => {
-                                                if(!inputRefs.current[rowIndex])
-                                                    inputRefs.current[rowIndex] = [];
-
-                                                inputRefs.current[rowIndex][colIndex] = el;
-                                            }
-                                        }
-
-                                        maxLength={1}
-
-                                        value={typed}
-
-                                        onChange={
-                                            e =>
-                                            handleCellChange(
-                                                rowIndex,
-                                                colIndex,
-                                                e.target.value
-                                            )
-                                        }
-
-                                        onKeyDown={
-                                            e =>
-                                            handleKeyDown(
-                                                e,
-                                                rowIndex,
-                                                colIndex
-                                            )
-                                        }
-
-                                        onClick={
-                                            () =>
-                                            selectCell(rowIndex, colIndex)
-                                        }
-
-                                        onFocus={
-                                            e => e.target.select()
-                                        }
-
-                                        style={{fontSize: Math.max(8, Math.floor(cellPx * 0.5))}}
-
-                                        className={`
-                                        w-full
-                                        h-full
-                                        text-center
-                                        font-bold
-                                        outline-none
-                                        ${bgClass}
-                                        ${isWrong ? "text-red-600" : "text-black"}
-                                        `}
-
-                                    />
-
-
-                                    </div>
-
-                                );
-
-                                }
-                            )
                         }
 
-                        </div>
 
+                        const typed =
+                            userAnswers[rowIndex][colIndex];
+
+
+                        const isWrong =
+                            showErrors &&
+                            typed !== "" &&
+                            typed !== cell.letter;
+
+
+                        const isActive =
+                            activeCell?.row === rowIndex &&
+                            activeCell?.col === colIndex;
+
+
+                        const inWord =
+                            isInActiveWord(rowIndex,colIndex);
+
+
+                        const superOrder =
+                            getSuperAnswerOrder(rowIndex,colIndex);
+
+
+                        let bgClass = "bg-transparent";
+
+                        if(isWrong) bgClass = "bg-red-50";
+
+                        else if(isActive) bgClass = "bg-blue-300";
+
+                        else if(inWord) bgClass = "bg-blue-100";
+
+
+
+                        return (
+
+                            <div
+                                key={`${rowIndex}-${colIndex}`}
+
+                                className={`
+                                border
+                                relative
+                                flex
+                                items-center
+                                justify-center
+                                ${bgClass}
+                                ${superOrder ? "ring-2 ring-orange-400" : ""}
+                                `}
+                            >
+
+                            {
+                                cell.number &&
+                                (
+
+                                <span
+                                    className="
+                                    absolute
+                                    top-0
+                                    left-1
+                                    text-[9px]
+                                    text-gray-500
+                                    pointer-events-none
+                                    "
+                                >
+
+                                    {cell.number}
+
+                                </span>
+
+                                )
+                            }
+
+
+                            {
+                                superOrder &&
+                                (
+
+                                <span
+                                    className="
+                                    absolute
+                                    bottom-0
+                                    right-1
+                                    text-[9px]
+                                    text-orange-600
+                                    font-bold
+                                    pointer-events-none
+                                    "
+                                >
+
+                                    {superOrder}
+
+                                </span>
+
+                                )
+                            }
+
+
+                            {/* the visible letter — centered reliably via flexbox on the
+                                parent, rather than depending on an <input>'s own vertical
+                                text-centering, which varies unpredictably across browsers */}
+                            <span
+                                aria-hidden="true"
+                                className={`
+                                pointer-events-none
+                                font-bold
+                                select-none
+                                ${isWrong ? "text-red-600" : "text-black"}
+                                `}
+                                style={{fontSize: Math.max(8, Math.floor(cellPx * 0.5))}}
+                            >
+
+                                {typed}
+
+                            </span>
+
+
+                            <input
+
+                                ref={
+                                    el => {
+                                        if(!inputRefs.current[rowIndex])
+                                            inputRefs.current[rowIndex] = [];
+
+                                        inputRefs.current[rowIndex][colIndex] = el;
+                                    }
+                                }
+
+                                maxLength={1}
+
+                                value={typed}
+
+                                onChange={
+                                    e =>
+                                    handleCellChange(
+                                        rowIndex,
+                                        colIndex,
+                                        e.target.value
+                                    )
+                                }
+
+                                onKeyDown={
+                                    e =>
+                                    handleKeyDown(
+                                        e,
+                                        rowIndex,
+                                        colIndex
+                                    )
+                                }
+
+                                onClick={
+                                    () =>
+                                    selectCell(rowIndex, colIndex)
+                                }
+
+                                onFocus={
+                                    e => e.target.select()
+                                }
+
+                                style={{
+                                    fontSize: Math.max(8, Math.floor(cellPx * 0.5)),
+                                    color: "transparent",
+                                    caretColor: "black"
+                                }}
+
+                                className="
+                                absolute
+                                inset-0
+                                w-full
+                                h-full
+                                text-center
+                                font-bold
+                                outline-none
+                                bg-transparent
+                                "
+
+                            />
+
+
+                            </div>
+
+                        );
+
+                        }
                     )
                 )
             }

@@ -455,6 +455,17 @@ export default function Editor() {
 
 
 
+    function removeWord(index:number) {
+
+        setWords(
+            words.filter((_,i) => i !== index)
+        );
+
+    }
+
+
+
+
 
     function generate() {
 
@@ -1447,6 +1458,25 @@ export default function Editor() {
                                         />
                                     )
                                 }
+
+
+                                <button
+
+                                    onClick={() => removeWord(index)}
+
+                                    className="
+                                    ml-3
+                                    text-xs
+                                    text-red-600
+                                    underline
+                                    whitespace-nowrap
+                                    "
+
+                                >
+
+                                    Remove
+
+                                </button>
 
                             </div>
 
